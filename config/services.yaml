@@ -23,6 +23,7 @@ parameters:
     username.pattern: "/^[a-z](?!.*[-_.][-_.])[a-z0-9-._]{2,18}[a-z0-9]/i"
     manticore.host: '%env(MANTICORE_HOST)%'
     manticore.port: '%env(int:MANTICORE_PORT)%'
+    analytics.origin: '%router.request_context.scheme%://%router.request_context.host%'
 
 services:
     _defaults:
@@ -48,6 +49,8 @@ services:
             $reminderEmailAddress: '%env(MAILER_REMINDER_ADDRESS)%'
             $termsOfUseEmailAddress: '%env(MAILER_TERMS_OF_USE_ADDRESS)%'
             $newsletterEmailAddress: '%env(MAILER_NEWSLETTER_ADDRESS)%'
+            $googleAnalyticsMeasurementId: '%env(GOOGLE_ANALYTICS_MEASUREMENT_ID)%'
+            $analyticsOrigin: '%analytics.origin%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name

@@ -1,0 +1,39 @@
+analytics.consent.title:
+    - Optional audience measurement
+    - Heading for the optional analytics consent request.
+analytics.consent.message:
+    - Help us understand how consenting visitors use BeWelcome. Google Analytics loads only if you allow it. We send synthetic page names, never real page addresses, searches, messages, profile details, or BeWelcome identifiers.
+    - Privacy-minimized explanation shown before optional analytics consent.
+analytics.consent.allow:
+    - Allow analytics
+    - Button that opts in to optional Google Analytics.
+analytics.consent.reject:
+    - Reject analytics
+    - Button that refuses optional Google Analytics.
+analytics.consent.privacy:
+    - Read the privacy policy
+    - Link from analytics consent to the privacy policy.
+analytics.settings.open:
+    - Cookie settings
+    - Persistent button used to reopen analytics consent settings.
+analytics.settings.description:
+    - Essential cookies support BeWelcome features. Optional Google Analytics is used only after your consent, and you can change your choice here at any time.
+    - Explanation in optional analytics settings.
+analytics.settings.status.label:
+    - Current analytics choice
+    - Label for the current analytics consent status.
+analytics.settings.status.granted:
+    - Allowed
+    - Status shown after optional analytics was allowed.
+analytics.settings.status.denied:
+    - Rejected
+    - Status shown after optional analytics was rejected.
+analytics.settings.status.unset:
+    - No choice saved
+    - Status shown before an analytics consent choice.
+analytics.settings.withdraw:
+    - Withdraw analytics consent
+    - Button that stops future optional analytics collection.
+analytics.settings.close:
+    - Close
+    - Button that closes optional analytics settings.

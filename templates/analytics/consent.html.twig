@@ -1,0 +1,67 @@
+{% set analytics = analytics_configuration(app.user is not null) %}
+{% if analytics %}
+    {% set consent_locale = analytics.consentLocale ?? app.request.locale %}
+    {% set tracking = {measurementId: analytics.measurementId, page: analytics.page} %}
+    <div class="bw-analytics" lang="{{ consent_locale }}" dir="auto"
+         data-analytics-configuration="{{ tracking|json_encode|e('html_attr') }}">
+        {% if analytics.consentLocale %}
+            <button type="button" class="bw-analytics__settings-button js-analytics-settings-open">
+                {{ 'analytics.settings.open'|trans({}, null, consent_locale) }}
+            </button>
+
+            {% if analytics.page %}
+                <section class="bw-analytics__banner js-analytics-banner"
+                         role="region"
+                         aria-labelledby="bw-analytics-consent-title"
+                         aria-describedby="bw-analytics-consent-message"
+                         hidden>
+                    <div class="bw-analytics__banner-content">
+                        <h2 id="bw-analytics-consent-title">{{ 'analytics.consent.title'|trans({}, null, consent_locale) }}</h2>
+                        <p id="bw-analytics-consent-message">{{ 'analytics.consent.message'|trans({}, null, consent_locale) }}</p>
+                        <a href="{{ url('privacy_policy', {locale: app.request.locale == 'fr' ? 'fr' : 'en'}) }}">
+                            {{ 'analytics.consent.privacy'|trans({}, null, consent_locale) }}
+                        </a>
+                    </div>
+                    <div class="bw-analytics__actions">
+                        <button type="button" class="btn btn-primary" data-analytics-action="allow">
+                            {{ 'analytics.consent.allow'|trans({}, null, consent_locale) }}
+                        </button>
+                        <button type="button" class="btn btn-primary" data-analytics-action="reject">
+                            {{ 'analytics.consent.reject'|trans({}, null, consent_locale) }}
+                        </button>
+                    </div>
+                </section>
+            {% endif %}
+
+            <dialog class="bw-analytics__modal js-analytics-settings"
+                    aria-labelledby="bw-analytics-settings-title">
+                <h2 id="bw-analytics-settings-title">{{ 'analytics.settings.open'|trans({}, null, consent_locale) }}</h2>
+                <p>{{ 'analytics.settings.description'|trans({}, null, consent_locale) }}</p>
+                <p>
+                    <strong>{{ 'analytics.settings.status.label'|trans({}, null, consent_locale) }}:</strong>
+                    <span class="js-analytics-status" aria-live="polite"
+                          data-granted="{{ 'analytics.settings.status.granted'|trans({}, null, consent_locale) }}"
+                          data-denied="{{ 'analytics.settings.status.denied'|trans({}, null, consent_locale) }}"
+                          data-unset="{{ 'analytics.settings.status.unset'|trans({}, null, consent_locale) }}"></span>
+                </p>
+                <div class="bw-analytics__actions">
+                    {% if analytics.consentLocale == app.request.locale %}
+                        <button type="button" class="btn btn-primary js-analytics-settings-allow" data-analytics-action="allow">
+                            {{ 'analytics.consent.allow'|trans({}, null, consent_locale) }}
+                        </button>
+                        <button type="button" class="btn btn-primary js-analytics-settings-reject" data-analytics-action="reject">
+                            {{ 'analytics.consent.reject'|trans({}, null, consent_locale) }}
+                        </button>
+                    {% endif %}
+                    <button type="button" class="btn btn-danger js-analytics-withdraw"
+                            data-analytics-action="reject" hidden>
+                        {{ 'analytics.settings.withdraw'|trans({}, null, consent_locale) }}
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-analytics-action="close">
+                        {{ 'analytics.settings.close'|trans({}, null, consent_locale) }}
+                    </button>
+                </div>
+            </dialog>
+        {% endif %}
+    </div>
+{% endif %}

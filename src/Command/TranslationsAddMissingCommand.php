@@ -36,6 +36,14 @@ class TranslationsAddMissingCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->note('Adding missing translations');
 
+        $memberRepository = $this->entityManager->getRepository(Member::class);
+        $admin = $memberRepository->find(1);
+
+        $languageRepository = $this->entityManager->getRepository(Language::class);
+        $english = $languageRepository->findOneBy(['shortCode' => 'en']);
+
+        $translationRepository = $this->entityManager->getRepository(Word::class);
+
         $finder = new Finder();
         $files = $finder->files()->name('*.yaml')->in('translations/missing');
 
@@ -43,14 +51,6 @@ class TranslationsAddMissingCommand extends Command
         $lastFile = '';
 
         foreach ($files as $file) {
-            $memberRepository = $this->entityManager->getRepository(Member::class);
-            $admin = $memberRepository->find(1);
-
-            $languageRepository = $this->entityManager->getRepository(Language::class);
-            $english = $languageRepository->findOneBy(['shortCode' => 'en']);
-
-            $translationRepository = $this->entityManager->getRepository(Word::class);
-
             $missing = Yaml::parseFile($file);
             foreach ($missing as $translationId => $missingTranslation) {
                 $sentence = $missingTranslation[0];
@@ -114,8 +114,44 @@ class TranslationsAddMissingCommand extends Command
             }
         }
 
+        $this->entityManager->flush();
+
+        $catalogue = Yaml::parseFile('translations/ready/analytics.yaml');
+        $sources = [];
+        foreach ($catalogue as $locale => $translations) {
+            $language = $languageRepository->findOneBy(['shortCode' => $locale]);
+            foreach ($translations as $translationId => $sentence) {
+                $translation = $translationRepository->findOneBy([
+                    'code' => $translationId,
+                    'language' => $language,
+                ]);
+                if (null !== $translation) {
+                    $this->entityManager->detach($translation);
+
+                    continue;
+                }
+
+                $source = $sources[$translationId] ??= $translationRepository->findOneBy([
+                    'code' => $translationId,
+                    'language' => $english,
+                ]);
+
+                $translation = new Word();
+                $translation->setCode($translationId);
+                $translation->setDescription($source->getDescription());
+                $translation->setSentence($sentence);
+                $translation->setDomain($source->getDomain());
+                $translation->setLanguage($language);
+                $translation->setTranslationAllowed($source->getTranslationAllowed());
+                $translation->setAuthor($admin);
+
+                $this->entityManager->persist($translation);
+                ++$count;
+            }
+        }
+
         if (0 === $count) {
-            $io->success('All translations in \'translation/missing\' were already imported.');
+            $io->success('All prepared translations were already imported.');
 
             return Command::SUCCESS;
         }

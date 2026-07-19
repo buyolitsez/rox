@@ -107,6 +107,9 @@ jobs:
           retry_wait_seconds: 15
           command: bun i --frozen-lockfile
 
+      - name: Run analytics tests
+        run: bun run test:analytics
+
       - name: Run webpack
         run: bun encore dev
 

@@ -1,14 +1,83 @@
-.cc-theme-edgeless.cc-window.cc-banner {
-  padding: 0.85rem 1rem;
-  box-shadow: 0 -12px 34px rgba(15, 23, 42, 0.18);
+.bw-analytics [hidden] { display: none !important; }
+
+.bw-analytics__settings-button {
+  position: fixed;
+  z-index: 1090;
+  bottom: 0.75rem;
+  left: 0.75rem;
+  border: 1px solid #f37000;
+  border-radius: 0.375rem;
+  padding: 0.4rem 0.7rem;
+  background: #fff;
+  color: #9d4800;
+  font-weight: 700;
+  box-shadow: 0 0.25rem 1rem rgba(15, 23, 42, 0.18);
 }
 
-.cc-theme-edgeless.cc-window.cc-banner .cc-btn {
-  height: auto;
+.bw-analytics__banner {
+  position: fixed;
+  z-index: 1100;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1rem max(1rem, calc((100vw - 1140px) / 2));
+  border-top: 1px solid #d8dee6;
+  background: #fff;
+  color: #334155;
+  box-shadow: 0 -0.75rem 2rem rgba(15, 23, 42, 0.18);
+}
+
+.bw-analytics__banner h2,
+.bw-analytics__modal h2 {
+  margin-top: 0;
+  font-size: 1.35rem;
+}
+
+.bw-analytics__banner p { margin-bottom: 0.25rem; }
+
+.bw-analytics__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.bw-analytics__actions .btn {
+  min-width: 10rem;
+  font-weight: 700;
+}
+
+.bw-analytics__modal {
+  z-index: 1110;
+  box-sizing: border-box;
+  width: calc(100% - 2rem);
+  max-width: 42rem;
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
   border: 0;
   border-radius: 0.5rem;
-  padding: 0.45rem 1rem;
-  font-weight: 700;
-  line-height: 1.2;
-  white-space: nowrap;
+  padding: 1.5rem;
+  background: #fff;
+  color: #334155;
+  box-shadow: 0 1rem 3rem rgba(15, 23, 42, 0.35);
+}
+
+.bw-analytics__modal::backdrop {
+  background: rgba(15, 23, 42, 0.65);
+}
+
+body.bw-analytics-settings-open { overflow: hidden; }
+
+@media (max-width: 767.98px) {
+  .bw-analytics__banner {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .bw-analytics__actions { flex-direction: column; }
+  .bw-analytics__actions .btn { width: 100%; }
 }

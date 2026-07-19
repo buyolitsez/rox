@@ -22,7 +22,6 @@
 
   {% block stylesheets %}{% endblock %}
 
-  {% block matomo %}{% endblock %}
   <base id="baseuri" href="{{ app.request.schemeAndHttpHost ~ app.request.baseUrl }}">
 
   <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
@@ -148,6 +147,7 @@
   </main>
 {% endblock main %}
 {% include 'footer.html.twig' %}
+{% include 'analytics/consent.html.twig' %}
 {{ encore_entry_script_tags('bewelcome') }}
 {{ encore_entry_script_tags('updatecounters') }}
 {% if sidebar %}

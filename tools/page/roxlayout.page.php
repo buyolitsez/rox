@@ -133,6 +133,7 @@ class PageWithRoxLayout extends PageWithHTML
     protected function footer()
     {
         echo $this->environment->render('footer.html.twig');
+        echo $this->environment->render('analytics/consent.html.twig');
         // require SCRIPT_BASE . "build/rox/templates/footer.php";
     }
 

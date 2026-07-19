@@ -186,39 +186,11 @@
 </main>
 
 {% include 'footer.html.twig' %}
+{% include 'analytics/consent.html.twig' %}
 
 {{ encore_entry_script_tags('home') }}
 {{ encore_entry_script_tags('jquery_ui') }}
 {{ encore_entry_script_tags('password/showhide') }}
-<script>
-    window.addEventListener("load", function () {
-        let locale = document.getElementsByTagName('html')[0].getAttribute('lang');
-        let privacyUrl = "/privacy";
-        if ('fr' === locale) {
-            privacyUrl += "/fr";
-        }
-        window.cookieconsent.initialise({
-            "palette": {
-                "popup": {
-                    "background": "#ffffff",
-                    "text": "#334155"
-                },
-                "button": {
-                    "background": "#f37000",
-                    "text": "#ffffff"
-                }
-            },
-            "theme": "edgeless",
-            "position": "bottom",
-            "content": {
-                "href": privacyUrl,
-                message: "{{ 'cookie.consent.message'|trans }}",
-                dismiss: "{{ 'cookie.consent.dismiss'|trans }}",
-                link: "{{ 'cookie.consent.learnmore'|trans }}"
-            }
-        })
-    });
-</script>
 {% endblock content %}
 </body>
 </html>

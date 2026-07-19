@@ -1,6 +1,6 @@
 {% import 'macros.twig' as macros %}
 <!doctype html>
-<html lang="en">
+<html lang="{{ app.request.locale }}">
 <head>
     <base href="/">
     <meta charset="utf-8">
@@ -199,6 +199,7 @@
 </main>
 {% endblock content %}
 {% include 'footer.html.twig' %}
+{% include 'analytics/consent.html.twig' %}
 {{ encore_entry_script_tags('bewelcome') }}
 {{ encore_entry_script_tags('password/showhide') }}
 </body>

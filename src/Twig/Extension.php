@@ -2,6 +2,7 @@
 
 namespace App\Twig;
 
+use App\Service\AnalyticsPageClassifier;
 use App\Utilities\ForumUtilities;
 use Carbon\Carbon;
 use HTMLPurifier;
@@ -38,6 +39,9 @@ class Extension extends AbstractExtension implements GlobalsInterface
         /** @var false|string[] */
         private readonly array $locales,
         private readonly string $publicDirectory,
+        private readonly AnalyticsPageClassifier $analyticsPageClassifier,
+        private readonly string $googleAnalyticsMeasurementId,
+        private readonly string $analyticsOrigin,
     ) {
     }
 
@@ -71,6 +75,51 @@ class Extension extends AbstractExtension implements GlobalsInterface
             new TwigFunction('encore_entry_css_source', $this->getEncoreEntryCssSource(...)),
             new TwigFunction('distance', $this->distance(...)),
             new TwigFunction('sgn', $this->sgn(...)),
+            new TwigFunction('analytics_configuration', $this->analyticsConfiguration(...)),
+        ];
+    }
+
+    public function analyticsConfiguration(bool $loggedIn): array
+    {
+        $request = $this->requestStack->getMainRequest() ?? $this->requestStack->getCurrentRequest();
+        if (null === $request) {
+            return [];
+        }
+
+        $locale = $request->getLocale();
+        $measurementId = trim($this->googleAnalyticsMeasurementId);
+        if (1 !== preg_match('/^G-[A-Z0-9]+$/', $measurementId)) {
+            $measurementId = null;
+
+            return [
+                'measurementId' => null,
+                'consentLocale' => null,
+                'page' => null,
+            ];
+        }
+
+        $localeReady = $this->analyticsPageClassifier->hasConsentTranslations($locale);
+        $consentLocale = $localeReady
+            ? $locale
+            : ($this->analyticsPageClassifier->hasConsentTranslations('en') ? 'en' : null);
+        $context = $localeReady
+            ? $this->analyticsPageClassifier->classify(
+                $request->attributes->getString('_route'),
+                $locale,
+                $loggedIn ? 'member' : 'visitor',
+            )
+            : null;
+
+        return [
+            'measurementId' => $measurementId,
+            'consentLocale' => $consentLocale,
+            'page' => null !== $context ? [
+                'page_location' => rtrim($this->analyticsOrigin, '/') . $context['path'],
+                'page_title' => $context['title'],
+                'content_group' => $context['contentGroup'],
+                'language' => $context['locale'],
+                'login_state' => $context['loginState'],
+            ] : null,
         ];
     }
 
