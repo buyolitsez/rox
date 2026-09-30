@@ -46,8 +46,8 @@
     <table class="table table-striped table-hover align-middle">
       <thead>
         <tr>
-          <th>{{ 'admin.flags.member'|trans }}</th>
-          <th>{{ 'admin.flags.flag'|trans }}</th>
+          <th>{{ (member_first ? 'admin.flags.member' : 'admin.flags.flag')|trans }}</th>
+          <th>{{ (member_first ? 'admin.flags.flag' : 'admin.flags.member')|trans }}</th>
           <th>{{ 'admin.flags.level'|trans }}</th>
           <th>{{ 'admin.flags.scope'|trans }}</th>
           <th>{{ 'admin.flags.comment'|trans }}</th>
@@ -57,29 +57,45 @@
         </tr>
       </thead>
       <tbody>
-        {% for assignment in assignments %}
-          <tr{% if assignment.level == 0 or assignment.superseded %} class="text-muted"{% endif %}>
-            <td>
-              <div class="d-flex align-items-start gap-2">
-                {{ macros.avatar(assignment.username, 50, true) }}
-                <div>
-                  <a href="{{ url('members_profile', {username: assignment.username}) }}">
-                    {{ assignment.username }}
-                  </a>
-                  <div class="small">{{ assignment.status }}</div>
-                  <div class="small">
-                    {{ assignment.last_active ? assignment.last_active|date('Y-m-d') : '—' }}
-                  </div>
-                  <div class="small">
-                    {{ assignment.place_name|default('—') }}{% if assignment.country_name %}, {{ assignment.country_name }}{% endif %}
-                  </div>
+        {# Rows are ordered by the grouping key, so a group starts whenever the key changes. #}
+        {% set group_key = member_first ? 'username' : 'definition_id' %}
+        {% set rows = assignments.currentPageResults %}
+        {% set previous_key = null %}
+        {% for assignment in rows %}
+          {% set member_cell %}
+            <div class="d-flex align-items-start gap-2">
+              {{ macros.avatar(assignment.username, 50, true) }}
+              <div>
+                <a href="{{ url('members_profile', {username: assignment.username}) }}">
+                  {{ assignment.username }}
+                </a>
+                <div class="small">{{ assignment.status }}</div>
+                <div class="small">
+                  {{ assignment.last_active ? assignment.last_active|date('Y-m-d') : '—' }}
                 </div>
+                <div class="small">
+                  {{ assignment.place_name|default('—') }}{% if assignment.country_name %}, {{ assignment.country_name }}{% endif %}
+                </div>
+                <a class="btn btn-sm btn-outline-primary mt-1"
+                   href="{{ url('admin_flags_assign_user', {username: assignment.username}) }}">
+                  <i class="fa fa-plus-square me-1" aria-hidden="true"></i>{{ 'admin.flags.assign'|trans }}
+                </a>
               </div>
-            </td>
+            </div>
+          {% endset %}
+          {% set flag_cell %}
+            <a href="{{ url('admin_flags_flag', {id: assignment.definition_id}) }}">
+              {{ assignment.definition_name }}
+            </a>
+          {% endset %}
+          <tr{% if assignment.level == 0 or assignment.superseded %} class="text-muted"{% endif %}>
+            {% if assignment[group_key] != previous_key %}
+              <td rowspan="{{ rows|filter(row => row[group_key] == assignment[group_key])|length }}" class="align-top">
+                {{ member_first ? member_cell : flag_cell }}
+              </td>
+            {% endif %}
             <td>
-              <a href="{{ url('admin_flags_flag', {id: assignment.definition_id}) }}">
-                {{ assignment.definition_name }}
-              </a>
+              {{ member_first ? flag_cell : member_cell }}
               {% if assignment.superseded %}
                 <span class="badge text-bg-secondary">{{ 'admin.flags.superseded'|trans }}</span>
               {% endif %}
@@ -104,6 +120,7 @@
               {% endif %}
             </td>
           </tr>
+          {% set previous_key = assignment[group_key] %}
         {% else %}
           <tr>
             <td colspan="8">{{ 'admin.assignments.none'|trans }}</td>

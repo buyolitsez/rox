@@ -151,6 +151,31 @@ final class AdminRightsControllerTest extends WebTestCase
         self::assertStringContainsString('Paging test', $crawler->filter('table tbody')->text());
     }
 
+    public function testMemberListGroupsByMemberAndRightListGroupsByRight(): void
+    {
+        $client = static::createClient();
+        $entityManager = $this->getEntityManager();
+        $connection = $entityManager->getConnection();
+        $wordsId = $this->getRightId($connection, 'Words');
+        $groupId = $this->getRightId($connection, 'Group');
+        $this->addRightAssignment($connection, 'member-empty', $wordsId, 1, '"All"', 'Grouping test');
+        $this->addRightAssignment($connection, 'member-empty', $groupId, 1, '"All"', 'Grouping test');
+        $this->addRightAssignment($connection, 'member-1', $wordsId, 1, '"All"', 'Grouping test');
+        $this->grantManagementRight($connection, 'member-2', 'Rights', '"All"');
+        $this->login($client, 'member-2', $entityManager);
+
+        $crawler = $client->request('GET', '/admin/rights/list/members', ['member' => 'member-empty']);
+        self::assertResponseIsSuccessful();
+        self::assertCount(2, $crawler->filter('table tbody tr'));
+        self::assertSame('2', $crawler->filter('table tbody td[rowspan]')->attr('rowspan'));
+        self::assertCount(1, $crawler->filter('table tbody a[href$="/admin/rights/assign/member-empty"]'));
+
+        $crawler = $client->request('GET', "/admin/rights/list/rights/{$wordsId}");
+        self::assertResponseIsSuccessful();
+        self::assertCount(1, $crawler->filter('table tbody td[rowspan]'));
+        self::assertStringContainsString('Words', $crawler->filter('table tbody td[rowspan]')->text());
+    }
+
     public function testFreshAssignmentSetsBothTimestampsAndRejectsDuplicateAndMissingCsrf(): void
     {
         $client = static::createClient();
