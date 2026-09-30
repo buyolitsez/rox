@@ -34,7 +34,7 @@
       <label for="flags-history" class="form-check-label">{{ 'admin.flags.history'|trans }}</label>
     </div>
     <div class="col-4 col-md-1">
-      <button class="btn btn-primary" type="submit">{{ 'admin.assignments.filter'|trans }}</button>
+      <button class="o-button" type="submit">{{ 'admin.assignments.filter'|trans }}</button>
     </div>
   </form>
 
@@ -76,7 +76,7 @@
                 <div class="small">
                   {{ assignment.place_name|default('—') }}{% if assignment.country_name %}, {{ assignment.country_name }}{% endif %}
                 </div>
-                <a class="btn btn-sm btn-outline-primary mt-1"
+                <a class="o-button o-button--s o-button--outline mt-1"
                    href="{{ url('admin_flags_assign_user', {username: assignment.username}) }}">
                   <i class="fa fa-plus-square me-1" aria-hidden="true"></i>{{ 'admin.flags.assign'|trans }}
                 </a>
@@ -105,18 +105,20 @@
             <td class="text-break">{{ assignment.comment|nl2br }}</td>
             <td>{{ assignment.created_at|date('Y-m-d H:i') }}</td>
             <td>{{ assignment.updated_at ? assignment.updated_at|date('Y-m-d H:i') : '—' }}</td>
-            <td class="text-nowrap">
+            <td>
               {% if not assignment.superseded and assignment.level != 0 %}
-                <a class="btn btn-sm btn-outline-primary"
-                   href="{{ url('admin_flags_edit', {id: assignment.definition_id, username: assignment.username}) }}"
-                   aria-label="{{ 'admin.assignments.edit'|trans }}">
-                  <i class="fa fa-edit" aria-hidden="true"></i>
-                </a>
-                <a class="btn btn-sm btn-outline-danger"
-                   href="{{ url('admin_flags_remove', {id: assignment.definition_id, username: assignment.username}) }}"
-                   aria-label="{{ 'admin.assignments.remove'|trans }}">
-                  <i class="fa fa-times" aria-hidden="true"></i>
-                </a>
+                <div class="d-flex gap-1">
+                  <a class="o-button o-button--s o-button--outline"
+                     href="{{ url('admin_flags_edit', {id: assignment.definition_id, username: assignment.username}) }}"
+                     aria-label="{{ 'admin.assignments.edit'|trans }}">
+                    <i class="fa fa-edit" aria-hidden="true"></i>
+                  </a>
+                  <a class="o-button o-button--s o-button--outline"
+                     href="{{ url('admin_flags_remove', {id: assignment.definition_id, username: assignment.username}) }}"
+                     aria-label="{{ 'admin.assignments.remove'|trans }}">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                  </a>
+                </div>
               {% endif %}
             </td>
           </tr>

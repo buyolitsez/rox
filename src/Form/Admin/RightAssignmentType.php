@@ -55,7 +55,7 @@ class RightAssignmentType extends AbstractType
             ])
             ->add('submit', SubmitType::class, [
                 'label' => 'AdminRightsSubmit',
-                'attr' => ['class' => 'btn-primary'],
+                'attr' => ['class' => 'o-button'],
             ])
         ;
     }

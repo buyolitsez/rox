@@ -182,7 +182,7 @@ class RightsController extends AbstractController
             'csrf_token_id' => 'remove-right-' . $assignment->getId(),
         ])->add('remove', SubmitType::class, [
             'label' => 'AdminRightsRemove',
-            'attr' => ['class' => 'btn-danger'],
+            'attr' => ['class' => 'o-button'],
         ])->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {

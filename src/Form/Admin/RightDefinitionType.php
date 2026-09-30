@@ -25,7 +25,7 @@ class RightDefinitionType extends AbstractType
             ])
             ->add('submit', SubmitType::class, [
                 'label' => 'AdminRightsCreate',
-                'attr' => ['class' => 'btn-primary'],
+                'attr' => ['class' => 'o-button'],
             ])
         ;
     }

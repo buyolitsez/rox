@@ -38,7 +38,7 @@
       </div>
     {% endif %}
     <div class="col-4 col-md-1">
-      <button class="btn btn-primary" type="submit">{{ 'admin.assignments.filter'|trans }}</button>
+      <button class="o-button" type="submit">{{ 'admin.assignments.filter'|trans }}</button>
     </div>
   </form>
 
@@ -80,7 +80,7 @@
                 <div class="small">
                   {{ assignment.place_name|default('—') }}{% if assignment.country_name %}, {{ assignment.country_name }}{% endif %}
                 </div>
-                <a class="btn btn-sm btn-outline-primary mt-1"
+                <a class="o-button o-button--s o-button--outline mt-1"
                    href="{{ url('admin_rights_assign', {username: assignment.username}) }}">
                   <i class="fa fa-plus-square me-1" aria-hidden="true"></i>{{ 'admin.rights.assign'|trans }}
                 </a>
@@ -104,19 +104,21 @@
             <td class="text-break">{{ assignment.comment|nl2br }}</td>
             <td>{{ assignment.created_at|date('Y-m-d H:i') }}</td>
             <td>{{ assignment.updated_at ? assignment.updated_at|date('Y-m-d H:i') : '—' }}</td>
-            <td class="text-nowrap">
-              <a class="btn btn-sm btn-outline-primary"
-                 href="{{ url('admin_rights_edit', {id: assignment.definition_id, username: assignment.username}) }}"
-                 aria-label="{{ 'admin.assignments.edit'|trans }}">
-                <i class="fa fa-edit" aria-hidden="true"></i>
-              </a>
-              {% if assignment.level != 0 %}
-                <a class="btn btn-sm btn-outline-danger"
-                   href="{{ url('admin_rights_remove', {id: assignment.definition_id, username: assignment.username}) }}"
-                   aria-label="{{ 'admin.assignments.remove'|trans }}">
-                  <i class="fa fa-times" aria-hidden="true"></i>
+            <td>
+              <div class="d-flex gap-1">
+                <a class="o-button o-button--s o-button--outline"
+                   href="{{ url('admin_rights_edit', {id: assignment.definition_id, username: assignment.username}) }}"
+                   aria-label="{{ 'admin.assignments.edit'|trans }}">
+                  <i class="fa fa-edit" aria-hidden="true"></i>
                 </a>
-              {% endif %}
+                {% if assignment.level != 0 %}
+                  <a class="o-button o-button--s o-button--outline"
+                     href="{{ url('admin_rights_remove', {id: assignment.definition_id, username: assignment.username}) }}"
+                     aria-label="{{ 'admin.assignments.remove'|trans }}">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                  </a>
+                {% endif %}
+              </div>
             </td>
           </tr>
           {% set previous_key = assignment[group_key] %}

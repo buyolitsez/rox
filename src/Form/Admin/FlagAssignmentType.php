@@ -54,7 +54,7 @@ class FlagAssignmentType extends AbstractType
             ])
             ->add('submit', SubmitType::class, [
                 'label' => 'AdminFlagsSubmit',
-                'attr' => ['class' => 'btn-primary'],
+                'attr' => ['class' => 'o-button'],
             ])
         ;
     }
