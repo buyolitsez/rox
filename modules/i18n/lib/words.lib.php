@@ -495,11 +495,12 @@ class MOD_words
         } else {
             $lookup_string = nl2br(stripslashes($row_sentence));
         }
-        while (!$res = @vsprintf($lookup_string, $args)) {
-            // if not enough arguments given, fill up with dummy arguments
-            $args[] = ' -x- ';
+        try {
+            return vsprintf($lookup_string, $args);
+        } catch (ValueError $exception) {
+            // Keep incomplete or malformed translations readable without retrying forever.
+            return $lookup_string;
         }
-        return $res;
     }
 
 
