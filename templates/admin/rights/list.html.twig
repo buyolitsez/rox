@@ -14,7 +14,7 @@
     <div class="col-12 col-md-4">
       <label for="rights-member" class="form-label">{{ 'admin.rights.member'|trans }}</label>
       <input id="rights-member" name="member" value="{{ filters.member }}"
-             class="form-control member-autocomplete-start" data->
+             class="form-control member-autocomplete-start">
     </div>
     <div class="col-12 col-md-3">
       <label for="rights-right" class="form-label">{{ 'admin.rights.right'|trans }}</label>
@@ -38,7 +38,7 @@
       </div>
     {% endif %}
     <div class="col-4 col-md-1">
-      <button class="btn btn-primary" type="submit">{{ 'admin.assignments.filter'|trans }}</button>
+      <button class="o-button" type="submit">{{ 'admin.assignments.filter'|trans }}</button>
     </div>
   </form>
 
@@ -50,8 +50,8 @@
     <table class="table table-striped table-hover align-middle">
       <thead>
         <tr>
-          <th>{{ 'admin.rights.member'|trans }}</th>
-          <th>{{ 'admin.rights.right'|trans }}</th>
+          <th>{{ (member_first ? 'admin.rights.member' : 'admin.rights.right')|trans }}</th>
+          <th>{{ (member_first ? 'admin.rights.right' : 'admin.rights.member')|trans }}</th>
           <th>{{ 'admin.rights.level'|trans }}</th>
           <th>{{ 'admin.rights.scope'|trans }}</th>
           <th>{{ 'admin.rights.comment'|trans }}</th>
@@ -61,50 +61,67 @@
         </tr>
       </thead>
       <tbody>
-        {% for assignment in assignments %}
-          <tr{% if assignment.level == 0 %} class="text-muted"{% endif %}>
-            <td>
-              <div class="d-flex align-items-start gap-2">
-                {{ macros.avatar(assignment.username, 50, true) }}
-                <div>
-                  <a href="{{ url('members_profile', {username: assignment.username}) }}">
-                    {{ assignment.username }}
-                  </a>
-                  <div class="small">{{ assignment.status }}</div>
-                  <div class="small">
-                    {{ assignment.last_active ? assignment.last_active|date('Y-m-d') : '—' }}
-                  </div>
-                  <div class="small">
-                    {{ assignment.place_name|default('—') }}{% if assignment.country_name %}, {{ assignment.country_name }}{% endif %}
-                  </div>
+        {# Rows are ordered by the grouping key, so a group starts whenever the key changes. #}
+        {% set group_key = member_first ? 'username' : 'definition_id' %}
+        {% set rows = assignments.currentPageResults %}
+        {% set previous_key = null %}
+        {% for assignment in rows %}
+          {% set member_cell %}
+            <div class="d-flex align-items-start gap-2">
+              {{ macros.avatar(assignment.username, 50, true) }}
+              <div>
+                <a href="{{ url('members_profile', {username: assignment.username}) }}">
+                  {{ assignment.username }}
+                </a>
+                <div class="small">{{ assignment.status }}</div>
+                <div class="small">
+                  {{ assignment.last_active ? assignment.last_active|date('Y-m-d') : '—' }}
                 </div>
+                <div class="small">
+                  {{ assignment.place_name|default('—') }}{% if assignment.country_name %}, {{ assignment.country_name }}{% endif %}
+                </div>
+                <a class="o-button o-button--s o-button--outline mt-1"
+                   href="{{ url('admin_rights_assign', {username: assignment.username}) }}">
+                  <i class="fa fa-plus-square me-1" aria-hidden="true"></i>{{ 'admin.rights.assign'|trans }}
+                </a>
               </div>
-            </td>
-            <td>
-              <a href="{{ url('admin_rights_right', {id: assignment.definition_id}) }}">
-                {{ assignment.definition_name }}
-              </a>
-            </td>
+            </div>
+          {% endset %}
+          {% set right_cell %}
+            <a href="{{ url('admin_rights_right', {id: assignment.definition_id}) }}">
+              {{ assignment.definition_name }}
+            </a>
+          {% endset %}
+          <tr{% if assignment.level == 0 %} class="text-muted"{% endif %}>
+            {% if assignment[group_key] != previous_key %}
+              <td rowspan="{{ rows|filter(row => row[group_key] == assignment[group_key])|length }}" class="align-top">
+                {{ member_first ? member_cell : right_cell }}
+              </td>
+            {% endif %}
+            <td>{{ member_first ? right_cell : member_cell }}</td>
             <td>{{ assignment.level }}</td>
             <td>{{ assignment.scope }}</td>
             <td class="text-break">{{ assignment.comment|nl2br }}</td>
             <td>{{ assignment.created_at|date('Y-m-d H:i') }}</td>
             <td>{{ assignment.updated_at ? assignment.updated_at|date('Y-m-d H:i') : '—' }}</td>
-            <td class="text-nowrap">
-              <a class="btn btn-sm btn-outline-primary"
-                 href="{{ url('admin_rights_edit', {id: assignment.definition_id, username: assignment.username}) }}"
-                 aria-label="{{ 'admin.assignments.edit'|trans }}">
-                <i class="fa fa-edit" aria-hidden="true"></i>
-              </a>
-              {% if assignment.level != 0 %}
-                <a class="btn btn-sm btn-outline-danger"
-                   href="{{ url('admin_rights_remove', {id: assignment.definition_id, username: assignment.username}) }}"
-                   aria-label="{{ 'admin.assignments.remove'|trans }}">
-                  <i class="fa fa-times" aria-hidden="true"></i>
+            <td>
+              <div class="d-flex gap-1">
+                <a class="o-button o-button--s o-button--outline"
+                   href="{{ url('admin_rights_edit', {id: assignment.definition_id, username: assignment.username}) }}"
+                   aria-label="{{ 'admin.assignments.edit'|trans }}">
+                  <i class="fa fa-edit" aria-hidden="true"></i>
                 </a>
-              {% endif %}
+                {% if assignment.level != 0 %}
+                  <a class="o-button o-button--s o-button--outline"
+                     href="{{ url('admin_rights_remove', {id: assignment.definition_id, username: assignment.username}) }}"
+                     aria-label="{{ 'admin.assignments.remove'|trans }}">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                  </a>
+                {% endif %}
+              </div>
             </td>
           </tr>
+          {% set previous_key = assignment[group_key] %}
         {% else %}
           <tr>
             <td colspan="8">{{ 'admin.assignments.none'|trans }}</td>

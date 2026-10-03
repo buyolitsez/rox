@@ -192,7 +192,7 @@ class FlagsController extends AbstractController
             'csrf_token_id' => 'remove-flag-' . $assignment->getId(),
         ])->add('remove', SubmitType::class, [
             'label' => 'admin.flags.remove',
-            'attr' => ['class' => 'btn-danger'],
+            'attr' => ['class' => 'btn btn-danger'],
         ])->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {

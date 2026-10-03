@@ -135,6 +135,33 @@ final class AdminFlagsControllerTest extends WebTestCase
         self::assertStringContainsString('Paging test', $crawler->filter('table tbody')->text());
     }
 
+    public function testMemberListGroupsByMemberAndFlagListGroupsByFlag(): void
+    {
+        $client = static::createClient();
+        $entityManager = $this->getEntityManager();
+        $connection = $entityManager->getConnection();
+        $this->grantFlagsManagement($connection, 'bwadmin', '"All"');
+        $suffix = (string) random_int(100_000, 999_999);
+        $firstFlagId = $this->createFlag($connection, "Grouping flag {$suffix}-1");
+        $secondFlagId = $this->createFlag($connection, "Grouping flag {$suffix}-2");
+        $this->addFlagAssignment($connection, 'member-empty', $firstFlagId, 1, 'Grouping test', '2026-01-01 00:00:00');
+        $this->addFlagAssignment($connection, 'member-empty', $secondFlagId, 1, 'Grouping test', '2026-01-01 00:00:00');
+        $this->addFlagAssignment($connection, 'member-1', $firstFlagId, 1, 'Grouping test', '2026-01-01 00:00:00');
+        $this->login($client, 'bwadmin', $entityManager);
+
+        $crawler = $client->request('GET', '/admin/flags/list/members', ['member' => 'member-empty']);
+        self::assertResponseIsSuccessful();
+        self::assertCount(2, $crawler->filter('table tbody tr'));
+        self::assertSame('2', $crawler->filter('table tbody td[rowspan]')->attr('rowspan'));
+        self::assertCount(1, $crawler->filter('table tbody a[href$="/admin/flags/assign/member-empty"]'));
+
+        $crawler = $client->request('GET', "/admin/flags/list/flags/{$firstFlagId}");
+        self::assertResponseIsSuccessful();
+        self::assertCount(2, $crawler->filter('table tbody tr'));
+        self::assertSame('2', $crawler->filter('table tbody td[rowspan]')->attr('rowspan'));
+        self::assertStringContainsString("Grouping flag {$suffix}-1", $crawler->filter('table tbody td[rowspan]')->text());
+    }
+
     public function testRemoveAndReassignCreatesANewCycleConsumedByLegacyNewestRecordRule(): void
     {
         $client = static::createClient();
