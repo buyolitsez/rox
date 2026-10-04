@@ -496,9 +496,9 @@ class MOD_words
             $lookup_string = nl2br(stripslashes($row_sentence));
         }
         try {
-            return vsprintf($lookup_string, $args);
+            return vsprintf($lookup_string, array_pad($args, 10, ' -x- '));
         } catch (ValueError $exception) {
-            // Keep incomplete or malformed translations readable without retrying forever.
+            error_log(sprintf('Malformed translation format for word "%s": %s', $row->code, $exception->getMessage()));
             return $lookup_string;
         }
     }
