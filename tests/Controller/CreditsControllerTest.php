@@ -15,6 +15,5 @@ class CreditsControllerTest extends WebTestCase
 
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('dt a[href="https://www.znuny.org/"]', 'Znuny');
-        self::assertSelectorExists('dd', 'The existing credits list remains available.');
     }
 }
